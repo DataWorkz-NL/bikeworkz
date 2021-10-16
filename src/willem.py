@@ -1,122 +1,146 @@
-"""apple.py
+#!/usr/bin/env python3
 
-Detect bottles
-
-Packages needed for this script:
-
-    - depthai
-
-So we do not need any numpy/open-cv or anything.
-"""
-
-from pathlib import Path
-import numpy as np
-import cv2
+# python core modules
+import sys
 import logging
 import argparse
 
-import depthai
+# 3rd party modules
+import cv2
+import numpy as np
+import depthai as dai
 
-CONFIG = {
-    "streams": ["previewout", "metaout", "depth"],
-    "ai": {
-        "blob_file": str(
-            Path("models/mobilenet-ssd/mobilenet-ssd.blob").resolve().absolute()
-        ),
-        "blob_file_config": str(
-            Path("models/mobilenet-ssd/mobilenet-ssd.json").resolve().absolute()
-        ),
-        "calc_dist_to_bb": True,
-        "camera_input": "right",
-    },
-}
+def run(args):
 
+	# Closer-in minimum depth, disparity range is doubled (from 95 to 190):
+	extended_disparity = False
+	# Better accuracy for longer distance, fractional disparity 32-levels:
+	subpixel = False
+	# Better handling for occlusions:
+	lr_check = False
 
-def screen_position(detection: depthai.Detection, meta: depthai.FrameMetadata) -> str:
-    """
-    Get the x coordinate of the bounding box, calculate the center of the
-    bounding box as a fraction of the screen width and convert this to: "left",
-    "center" or "right".
-    """
-    loc = detection.x_max - detection.x_min / meta.getFrameWidth()
-    if loc < 0.33:
-        return "right"
-    elif 0.33 < loc < 0.66:
-        return "center"
-    else:
-        return "left"
+	recorder = None
 
+	# Create pipeline
+	pipeline = dai.Pipeline()
 
-def run(args: argparse.Namespace):
+	# Define sources and outputs
+	monoLeft = pipeline.createMonoCamera()
+	monoRight = pipeline.createMonoCamera()
+	depth = pipeline.createStereoDepth()
+	xout = pipeline.createXLinkOut()
 
-    device = depthai.Device("", False)
-    # Create the pipeline using the 'previewout, metaout & depth' stream,
-    # establishing the first connection to the device.
-    pipeline = device.create_pipeline(config=CONFIG)
+	xout.setStreamName("disparity")
 
-    # pipeline has not been created succesfully, raise error.
-    if pipeline is None:
-        raise RuntimeError("Pipeline creation failed!")
+	# Properties
+	monoLeft.setResolution(dai.MonoCameraProperties.SensorResolution.THE_400_P)
+	monoLeft.setBoardSocket(dai.CameraBoardSocket.LEFT)
+	monoRight.setResolution(dai.MonoCameraProperties.SensorResolution.THE_400_P)
+	monoRight.setBoardSocket(dai.CameraBoardSocket.RIGHT)
 
-    # We need an empty list
-    detections = []
-    cont = True
-    out = None
+	# Create a node that will produce the depth map (using disparity output as it's easier to visualize depth this way)
+	depth.initialConfig.setConfidenceThreshold(200)
+	# Options: MEDIAN_OFF, KERNEL_3x3, KERNEL_5x5, KERNEL_7x7 (default)
+	depth.initialConfig.setMedianFilter(dai.MedianFilter.KERNEL_7x7)
+	depth.setLeftRightCheck(lr_check)
+	depth.setExtendedDisparity(extended_disparity)
+	depth.setSubpixel(subpixel)
 
-    while cont:
-        nnet_packets, data_packets = pipeline.get_available_nnet_and_data_packets()
+	# Linking
+	monoLeft.out.link(depth.left)
+	monoRight.out.link(depth.right)
+	depth.disparity.link(xout.input)
 
-        # Do detections
-        for nnet_packet in nnet_packets:
-            detections = list(nnet_packet.getDetectedObjects())
+	# Connect to device and start pipeline
+	with dai.Device(pipeline) as device:
 
-        for packet in data_packets:
+		# Output queue will be used to get the disparity frames from the outputs defined above
+		q = device.getOutputQueue(name="disparity", maxSize=4, blocking=False)
 
-            if packet.stream_name == "previewout":
-                meta = packet.getMetadata()
+		# initialize the frames
+		previous_frame = None
 
-                for detection in detections:
-                    # bottle has label 5
-                    if int(detection.label) == 5:
-                        timestamp = meta.getTimestamp()
-                        screen_pos = screen_position(detection, meta)
-                        depth = detection.depth_z
-                        logging.debug(f"{timestamp} : bottle : {screen_pos} : {depth}")
+		# loop it
+		while True:
+			inDepth = q.get()  # blocking call, will wait until a new data has arrived
+			frame = inDepth.getFrame()
 
-            if packet.stream_name == 'depth' and args.record:
-                # get the depth frame
-                window_name = packet.stream_name
-                frame = packet.getData()
-                frame = (65535 // frame).astype(np.uint8)
-                frame = cv2.applyColorMap(frame, cv2.COLORMAP_HOT)
+			# Normalization for better visualization
+			frame = (frame * (255 / depth.initialConfig.getMaxDisparity())).astype(np.uint8)
 
-                # instantiate an output writer
-                if not out:
-                    height, width, channels = frame.shape
-                    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-                    out = cv2.VideoWriter('output.mp4', fourcc, 20, (width, height))
+			# get the frame dimensions
+			width, height = frame.shape
+			x = int(width / 4)
+			y = int(height / 4)
+			w = int(width / 2)
+			h = int(height / 2)
 
-                # Add frame to output video
-                out.write(frame)
+			# initialize the frames
+			acceleration_frame = frame
+			ROI = frame[x:x+w, y:y+h]
 
-        if cv2.waitKey(1) == ord('q'):
-            break
+			if previous_frame is not None:
 
-    # The pipeline object should be deleted after exiting the loop. Otherwise 
-    # device will continue working. This is required if you are going to add 
-    # code after exiting the loop.
-    del pipeline
-    del device
+				# get the acceleration per pixel
+				acceleration_frame = previous_frame - frame
 
-    # clean opencv nicely
-    out.release()
-    cv2.destroyAllWindows() 
+				# crop to region of interest
+				ROI = acceleration_frame[x:x+w, y:y+h]
+
+				# remove the noise from the mask
+				kernel = np.ones((5,5), np.uint8)
+				ROI = cv2.erode(ROI, kernel, iterations=2)
+
+				if np.sum(ROI) > args.alert_threshold:
+					logging.warning('COLLISION ALLERT')
+
+			# update the previous frame
+			previous_frame = frame
+
+			# show the output
+			if args.show:
+
+				# convert mask to BGR format
+				frame_bgr = cv2.cvtColor(frame, cv2.COLOR_GRAY2BGR)
+
+				# Available color maps: https://docs.opencv.org/3.4/d3/d50/group__imgproc__colormap.html
+				frame_coloured = cv2.applyColorMap(frame, cv2.COLORMAP_JET)
+
+				# overlay ROI to frame
+				frame_coloured_roi = frame.copy()
+				frame_coloured_roi[x:x+w, y:y+h] = ROI
+				frame_coloured_roi = cv2.applyColorMap(frame_coloured_roi, cv2.COLORMAP_JET)
+
+				# show it
+				combined = cv2.hconcat([frame_bgr, frame_coloured_roi])
+
+				# record the files
+				if args.record:
+					if not recorder:
+						height, width, channels = combined.shape
+						fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+						recorder = cv2.VideoWriter('output.mp4', fourcc, 20, (width, height))
+
+					# Add frame to output video
+					recorder.write(combined)
+
+				cv2.imshow("combined", combined)
+
+			if cv2.waitKey(1) == ord('q'):
+				break
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--record", default=False)
-    args = parser.parse_args()
+	logging.basicConfig(
+		format='[%(asctime)s] %(levelname)s - %(message)s',
+		stream=sys.stdout, 
+		level=logging.DEBUG
+	)
 
-    logging.basicConfig(filename="joep.log", level=logging.DEBUG)
-    run(args)
+	parser = argparse.ArgumentParser()
+	parser.add_argument("-s", "--show", action='store_true')
+	parser.add_argument("-r", "--record", action='store_true')
+	parser.add_argument("-t", "--alert_threshold", default=1000000)
+	args = parser.parse_args()
+
+	run(args)
