@@ -74,6 +74,16 @@ run object detection on the camera and periodically update a file that will eith
 contain a simple `0` or a `1`. The script `src/joep.py` will continually read the output
 file from `src/pears.py` and based on the number turn on an orange or a red LED.
 
+## 2021-10-16, 21:32 - Nothing is actually working
+
+We decided to take the next few steps: premature optimization and feature bloat. As was
+expected: this did not lead to a better product. In hindsight we should have simply
+milked the working prototype and left it there. But no, beer, bacardi cola made us over
+confident. We wanted exotic LED blinking patterns, depth and speed detection of our
+objects... on a Raspberry Pi. Does this sound like a project suited for 3 increasingly
+intoxicated programmers? No. Like Icarus we flew too close to the sun, we were too
+ambitious, we've failed....
+
 ## Communication
 
 Communication between camera (script) and arduino is done by writing to a file. This
