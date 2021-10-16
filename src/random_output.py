@@ -4,7 +4,7 @@ import random
 f = open("willem.log",'w')
 try:
 	while True:
-		output = str(random.choice([0, 1, 2]))
+		output = str(random.choice([0, 1, 2,3])) + str(random.choice([0, 1]))
 
 		# print(output)
 		f.seek(0)

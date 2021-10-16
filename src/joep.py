@@ -43,46 +43,29 @@ def numbers_to_function(argument):
 
 ser = serial.Serial('/dev/cu.usbserial-145330', 115200)
 # sleep for device getting ready
-time.sleep(0.1)
-# ser.writelines(b'q')
-# time.sleep(0.5)
-# one()
-# ser.close()
+time.sleep(2)
 
 def parse_code(code: str) -> str:
-
-    if (code[0] == 0):
+    if code[0] == '0':
         return b's'
-
-    if code[0] == 1:
+    if code[0] == '1':
         return b'a'
-    elif code[0] == 2:
+    elif code[0] == '2':
         return b'w'
-    elif code[0] == 3:
+    elif code[0] == '3':
         return b'd'
     else:
         return b's'
 
-
-
-
-
 f = open("joep.log",'r')
-
-lines = f.readlines()
 
 try:
     while True:
-        # lines = f.readlines()
-        # print(lines)
         code = f.readline()
         
-        
-        ser.write(parse_code(code))
+        payload = parse_code(code)
+        respsonse = ser.write(payload)
         time.sleep(0.1)
-
-        # numbers_to_function(first_line)
-        # time.sleep(0.5) 
         f.seek(0)
 finally:
     f.close()
