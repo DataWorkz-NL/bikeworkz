@@ -1,26 +1,3 @@
-/*
-  Physical Pixel
-
-  An example of using the Arduino board to receive data from the computer. In
-  this case, the Arduino boards turns on an LED when it receives the character
-  'H', and turns off the LED when it receives the character 'L'.
-
-  The data can be sent from the Arduino Serial Monitor, or another program like
-  Processing (see code below), Flash (via a serial-net proxy), PD, or Max/MSP.
-
-  The circuit:
-  - LED connected from digital pin 13 to ground through 220 ohm resistor
-
-  created 2006
-  by David A. Mellis
-  modified 30 Aug 2011
-  by Tom Igoe and Scott Fitzgerald
-
-  This example code is in the public domain.
-
-  https://www.arduino.cc/en/Tutorial/BuiltInExamples/PhysicalPixel
-*/
-
 
 // starting from left to right
 const int ledLefGrePin = 9;
@@ -34,140 +11,133 @@ const int ledRigYelPin = 3;
 const int ledRigRedPin = 4;
 int incomingByte;      // a variable to read incoming serial data into
 
+
+const int noobArray[] = {
+  ledLefGrePin,
+  ledLefYelPin,
+  ledLefRedPin,
+  ledCenGrePin,
+  ledCenYelPin,
+  ledCenRedPin,
+  ledRigGrePin,
+  ledRigYelPin,
+  ledRigRedPin
+};
+
+const String ledArray[9][2] = {
+  {"ledLefGrePin", "9"},
+  {"ledLefYelPin", "11"},
+  {"ledLefRedPin", "12"},
+  {"ledCenGrePin", "5"},
+  {"ledCenYelPin", "6"},
+  {"ledCenRedPin", "7"},
+  {"ledRigGrePin", "2"},
+  {"ledRigYelPin", "3"},
+  {"ledRigRedPin", "4"}
+};
+const int arrayLength = 9;
+//const int ledLength = sizeof(ledArray);
+
+
 void setup() {
   // initialize serial communication:
   Serial.begin(115200);
   // initialize the LED pin as an output:
-  pinMode(ledLefGrePin, OUTPUT);
-  pinMode(ledLefYelPin, OUTPUT);
-  pinMode(ledLefRedPin, OUTPUT);
-  pinMode(ledCenGrePin, OUTPUT);
-  pinMode(ledCenYelPin, OUTPUT);
-  pinMode(ledCenRedPin, OUTPUT);
-  pinMode(ledRigGrePin, OUTPUT);
-  pinMode(ledRigYelPin, OUTPUT);
-  pinMode(ledRigRedPin, OUTPUT);
+  for (int i = 0; i <= 9; i++) {
+    //    pinMode(ledArray[i], OUTPUT);
+    int id = ledArray[i][1].toInt();
+    pinMode(id, OUTPUT);
+  }
 }
 
 void loop() {
+
   // see if there's incoming serial data:
   if (Serial.available() > 0) {
     // read the oldest byte in the serial buffer:
     incomingByte = Serial.read();
 
+    int woei[arrayLength];
 
-     switch (incomingByte) {
+    switch (incomingByte) {
       case '2':
         // middle red
-        digitalWrite(ledLefGrePin, HIGH);
-        digitalWrite(ledCenGrePin, LOW);
-        digitalWrite(ledRigGrePin, HIGH);
-        digitalWrite(ledRigYelPin, LOW);
-        digitalWrite(ledCenYelPin, LOW);
-        digitalWrite(ledLefYelPin, LOW);
-        digitalWrite(ledLefRedPin, LOW);
-        digitalWrite(ledCenRedPin, HIGH);
-        digitalWrite(ledRigRedPin, LOW);
+        woei[0] = ledLefGrePin;
+        woei[1] = ledRigGrePin;
+        woei[2] = ledCenRedPin;
         break;
-       case 'w':
+      case 'w':
         // middle yellow
-        digitalWrite(ledLefGrePin, HIGH);
-        digitalWrite(ledCenGrePin, LOW);
-        digitalWrite(ledRigGrePin, HIGH);
-        digitalWrite(ledRigYelPin, LOW);
-        digitalWrite(ledCenYelPin, HIGH);
-        digitalWrite(ledLefYelPin, LOW);
-        digitalWrite(ledLefRedPin, LOW);
-        digitalWrite(ledCenRedPin, LOW);
-        digitalWrite(ledRigRedPin, LOW);
+        woei[0] = ledLefGrePin;
+        woei[1] = ledRigGrePin;
+        woei[2] = ledCenYelPin;
         break;
       case 'q':
         // left red
-        digitalWrite(ledLefGrePin, LOW);
-        digitalWrite(ledCenGrePin, HIGH);
-        digitalWrite(ledRigGrePin, HIGH);
-        digitalWrite(ledRigYelPin, LOW);
-        digitalWrite(ledCenYelPin, LOW);
-        digitalWrite(ledLefYelPin, LOW);
-        digitalWrite(ledLefRedPin, HIGH);
-        digitalWrite(ledCenRedPin, LOW);
-        digitalWrite(ledRigRedPin, LOW);
+        woei[0] = ledCenGrePin;
+        woei[1] = ledRigGrePin;
+        woei[2] = ledLefRedPin;
         break;
-       case 'a':
+      case 'a':
         // left yellow
-        digitalWrite(ledLefGrePin, LOW);
-        digitalWrite(ledCenGrePin, HIGH);
-        digitalWrite(ledRigGrePin, HIGH);
-        digitalWrite(ledRigYelPin, LOW);
-        digitalWrite(ledCenYelPin, LOW);
-        digitalWrite(ledLefYelPin, HIGH);
-        digitalWrite(ledLefRedPin, LOW);
-        digitalWrite(ledCenRedPin, LOW);
-        digitalWrite(ledRigRedPin, LOW);
+        woei[0] = ledCenGrePin;
+        woei[1] = ledRigGrePin;
+        woei[2] = ledLefYelPin;
         break;
       case 'd':
         // right yellow
-        digitalWrite(ledLefGrePin, HIGH);
-        digitalWrite(ledCenGrePin, HIGH);
-        digitalWrite(ledRigGrePin, LOW);
-        digitalWrite(ledRigYelPin, HIGH);
-        digitalWrite(ledCenYelPin, LOW);
-        digitalWrite(ledLefYelPin, LOW);
-        digitalWrite(ledLefRedPin, LOW);
-        digitalWrite(ledCenRedPin, LOW);
-        digitalWrite(ledRigRedPin, LOW);
+        woei[0] = ledLefGrePin;
+        woei[1] = ledCenGrePin;
+        woei[2] = ledRigYelPin;
         break;
-       case 'e':
+      case 'e':
         // right red
-        digitalWrite(ledLefGrePin, HIGH);
-        digitalWrite(ledCenGrePin, HIGH);
-        digitalWrite(ledRigGrePin, LOW);
-        digitalWrite(ledRigYelPin, LOW);
-        digitalWrite(ledCenYelPin, LOW);
-        digitalWrite(ledLefYelPin, LOW);
-        digitalWrite(ledLefRedPin, LOW);
-        digitalWrite(ledCenRedPin, LOW);
-        digitalWrite(ledRigRedPin, HIGH);
+        woei[0] = ledLefGrePin;
+        woei[1] = ledCenGrePin;
+        woei[2] = ledRigRedPin;
         break;
       case 's':
         // good state
-        digitalWrite(ledLefGrePin, HIGH);
-        digitalWrite(ledCenGrePin, HIGH);
-        digitalWrite(ledRigGrePin, HIGH);
-        digitalWrite(ledRigYelPin, LOW);
-        digitalWrite(ledCenYelPin, LOW);
-        digitalWrite(ledLefYelPin, LOW);
-        digitalWrite(ledLefRedPin, LOW);
-        digitalWrite(ledCenRedPin, LOW);
-        digitalWrite(ledRigRedPin, LOW);
+        woei[0] = ledLefGrePin;
+        woei[1] = ledCenGrePin;
+        woei[2] = ledRigGrePin;
         break;
-    }
 
-//    // good state
-//    if (incomingByte == 'q') {
-//      digitalWrite(ledLefGrePin, HIGH);
-//      digitalWrite(ledLefGrePin, HIGH);
-//      digitalWrite(ledLefGrePin, HIGH);
-//    }
-//    // if it's an L (ASCII 76) turn off the LED:
-//    if (incomingByte == 'w') {
-//      digitalWrite(ledRed1Pin, LOW);
-//    }
-//    if (incomingByte == 'e') {
-//      digitalWrite(ledYel1Pin, HIGH);
-//    }
-//    // if it's an L (ASCII 76) turn off the LED:
-//    if (incomingByte == 'r') {
-//      digitalWrite(ledYel1Pin, LOW);
-//    }
-//    if (incomingByte == 't') {
-//      digitalWrite(ledGre1Pin, HIGH);
-//    }
-//    // if it's an L (ASCII 76) turn off the LED:
-//    if (incomingByte == 'y') {
-//      digitalWrite(ledGre1Pin, LOW);
-//    }
+    }
+    writeDigital(woei);
   }
+}
+
+void writeDigital(int list[]) {
+  //  int length = 0;
+  for (int i = 0; i <= arrayLength; i++) {
+    int id = ledArray[i][1].toInt();
+    if (inArrayInt(list, id)) {
+      digitalWrite(id, HIGH);
+    } else {
+      digitalWrite(id, LOW);
+    }
+  }
+}
+
+bool inArrayInt(int check[], int value) {
+  const int arrayLength = sizeof(check);
+  for (int x = 0; x <= arrayLength; x++) {
+    if (value == check[x]) {
+      return true;
+    }
+  }
+  return false;
+}
+
+bool inArrayString(String check[], String value) {
+  const int arrayLength = sizeof(check);
+  for (int x = 0; x < arrayLength; x++) {
+    if (value == check[x]) {
+      return true;
+    }
+  }
+  return false;
 }
 
 /* Processing code for this example
