@@ -73,3 +73,18 @@ The script `src/pears.py` is now able to run on a Raspberry Pi. This means that 
 run object detection on the camera and periodically update a file that will either
 contain a simple `0` or a `1`. The script `src/joep.py` will continually read the output
 file from `src/pears.py` and based on the number turn on an orange or a red LED.
+
+## Communication
+
+Communication between camera (script) and arduino is done by writing to a file. This
+file contains two digits, which will determine the combination of LED's turning on:
+
+- Position 1:
+  - 0: No object detected
+  - 1: Object detected on the left
+  - 2: Object detected in the center
+  - 3: Object detected on the right
+- Position 2:
+  - 0: Moves away from me - warning - green/yellow
+  - 1: Moves closer to me (slowly) - yellow/read
+  - 2: Moves alarmingly fast closer to me - red/blinking
