@@ -8,6 +8,7 @@ def run() -> None:
     # SETUP
     # =================================================================================
 
+    print("[INFO] Setting up camera connection and building data pipelines on camera.")
     # We need a pipeline. The pipeline runs on the device and we can ".get()" the output
     # of the different streams/components.
 
@@ -38,11 +39,13 @@ def run() -> None:
     nn.out.link(nnOut.input)
 
     f = open("joep.log", "w")
+
     # =================================================================================
     # RUN
     # =================================================================================
 
     try:
+        print("[INFO] starting bottle detection")
         # Connect to device and start pipeline
         with dai.Device(pipeline) as device:
 
@@ -71,6 +74,7 @@ def run() -> None:
                 f.seek(0)
                 f.write(output)
     finally:
+        print("[WARNING] closing file")
         f.close()
 
 
