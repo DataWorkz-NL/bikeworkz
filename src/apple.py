@@ -29,8 +29,10 @@ CONFIG = {
 }
 
 
-def screen_position(detection: depthai.Detection, meta: depthai.FrameMetadata) -> str:
+def screen_position(detection, meta) -> str:
     """
+    :param depthai.Detection detection
+    :param depthai.FrameMetadata meta
     Get the x coordinate of the bounding box, calculate the center of the
     bounding box as a fraction of the screen width and convert this to: "left",
     "center" or "right".
