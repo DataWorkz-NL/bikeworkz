@@ -21,18 +21,32 @@
   https://www.arduino.cc/en/Tutorial/BuiltInExamples/PhysicalPixel
 */
 
-const int ledGre1Pin = 2;
-const int ledYel1Pin = 3;
-const int ledRed1Pin = 4;
+
+// starting from left to right
+const int ledLefGrePin = 9;
+const int ledLefYelPin = 11;
+const int ledLefRedPin = 12;
+const int ledCenGrePin = 5;
+const int ledCenYelPin = 0;
+const int ledCenRedPin = 7;
+const int ledRigGrePin = 2;
+const int ledRigYelPin = 3;
+const int ledRigRedPin = 4;
 int incomingByte;      // a variable to read incoming serial data into
 
 void setup() {
   // initialize serial communication:
   Serial.begin(115200);
   // initialize the LED pin as an output:
-  pinMode(ledGre1Pin, OUTPUT);
-  pinMode(ledYel1Pin, OUTPUT);
-  pinMode(ledRed1Pin, OUTPUT);
+  pinMode(ledLefGrePin, OUTPUT);
+  pinMode(ledLefYelPin, OUTPUT);
+  pinMode(ledLefRedPin, OUTPUT);
+  pinMode(ledCenGrePin, OUTPUT);
+  pinMode(ledCenYelPin, OUTPUT);
+  pinMode(ledCenRedPin, OUTPUT);
+  pinMode(ledRigGrePin, OUTPUT);
+  pinMode(ledRigYelPin, OUTPUT);
+  pinMode(ledRigRedPin, OUTPUT);
 }
 
 void loop() {
@@ -40,28 +54,83 @@ void loop() {
   if (Serial.available() > 0) {
     // read the oldest byte in the serial buffer:
     incomingByte = Serial.read();
-    // if it's a capital H (ASCII 72), turn on the LED:
-    if (incomingByte == 'q') {
-      digitalWrite(ledRed1Pin, HIGH);
+
+
+     switch (incomingByte) {
+      case 'w':
+        // middle red
+        digitalWrite(ledLefGrePin, HIGH);
+        digitalWrite(ledCenGrePin, LOW);
+        digitalWrite(ledRigGrePin, HIGH);
+        digitalWrite(ledRigYelPin, LOW);
+        digitalWrite(ledCenYelPin, LOW);
+        digitalWrite(ledLefYelPin, LOW);
+        digitalWrite(ledLefRedPin, LOW);
+        digitalWrite(ledCenRedPin, HIGH);
+        digitalWrite(ledRigRedPin, LOW);
+        break;
+      case 'a':
+        // left red
+        digitalWrite(ledLefGrePin, LOW);
+        digitalWrite(ledCenGrePin, HIGH);
+        digitalWrite(ledRigGrePin, HIGH);
+        digitalWrite(ledRigYelPin, LOW);
+        digitalWrite(ledCenYelPin, LOW);
+        digitalWrite(ledLefYelPin, LOW);
+        digitalWrite(ledLefRedPin, HIGH);
+        digitalWrite(ledCenRedPin, LOW);
+        digitalWrite(ledRigRedPin, LOW);
+        break;
+      case 'd':
+        // right red
+        digitalWrite(ledLefGrePin, HIGH);
+        digitalWrite(ledCenGrePin, HIGH);
+        digitalWrite(ledRigGrePin, LOW);
+        digitalWrite(ledRigYelPin, LOW);
+        digitalWrite(ledCenYelPin, LOW);
+        digitalWrite(ledLefYelPin, LOW);
+        digitalWrite(ledLefRedPin, LOW);
+        digitalWrite(ledCenRedPin, LOW);
+        digitalWrite(ledRigRedPin, HIGH);
+        break;
+      case 's':
+        // good state
+        digitalWrite(ledLefGrePin, HIGH);
+        digitalWrite(ledCenGrePin, HIGH);
+        digitalWrite(ledRigGrePin, HIGH);
+        digitalWrite(ledRigYelPin, LOW);
+        digitalWrite(ledCenYelPin, LOW);
+        digitalWrite(ledLefYelPin, LOW);
+        digitalWrite(ledLefRedPin, LOW);
+        digitalWrite(ledCenRedPin, LOW);
+        digitalWrite(ledRigRedPin, LOW);
+        break;
     }
-    // if it's an L (ASCII 76) turn off the LED:
-    if (incomingByte == 'w') {
-      digitalWrite(ledRed1Pin, LOW);
-    }
-    if (incomingByte == 'e') {
-      digitalWrite(ledYel1Pin, HIGH);
-    }
-    // if it's an L (ASCII 76) turn off the LED:
-    if (incomingByte == 'r') {
-      digitalWrite(ledYel1Pin, LOW);
-    }
-    if (incomingByte == 't') {
-      digitalWrite(ledGre1Pin, HIGH);
-    }
-    // if it's an L (ASCII 76) turn off the LED:
-    if (incomingByte == 'y') {
-      digitalWrite(ledGre1Pin, LOW);
-    }
+
+//    // good state
+//    if (incomingByte == 'q') {
+//      digitalWrite(ledLefGrePin, HIGH);
+//      digitalWrite(ledLefGrePin, HIGH);
+//      digitalWrite(ledLefGrePin, HIGH);
+//    }
+//    // if it's an L (ASCII 76) turn off the LED:
+//    if (incomingByte == 'w') {
+//      digitalWrite(ledRed1Pin, LOW);
+//    }
+//    if (incomingByte == 'e') {
+//      digitalWrite(ledYel1Pin, HIGH);
+//    }
+//    // if it's an L (ASCII 76) turn off the LED:
+//    if (incomingByte == 'r') {
+//      digitalWrite(ledYel1Pin, LOW);
+//    }
+//    if (incomingByte == 't') {
+//      digitalWrite(ledGre1Pin, HIGH);
+//    }
+//    // if it's an L (ASCII 76) turn off the LED:
+//    if (incomingByte == 'y') {
+//      digitalWrite(ledGre1Pin, LOW);
+//    }
   }
 }
 
