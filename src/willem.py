@@ -11,6 +11,7 @@ import numpy as np
 import depthai as dai
 
 def run(args):
+	logging.info('initializing')
 
 	# Closer-in minimum depth, disparity range is doubled (from 95 to 190):
 	extended_disparity = False
@@ -53,6 +54,7 @@ def run(args):
 
 	# Connect to device and start pipeline
 	with dai.Device(pipeline) as device:
+		logging.info('Start process')
 
 		# Output queue will be used to get the disparity frames from the outputs defined above
 		q = device.getOutputQueue(name="disparity", maxSize=4, blocking=False)
