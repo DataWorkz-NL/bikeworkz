@@ -58,7 +58,7 @@ run:
 
 ``` bash
 git clone git@github.com:luxonis/depthai-python.git
-cd examples
+cd depthai-python/examples
 python install_requirements.txt
 ```
 
