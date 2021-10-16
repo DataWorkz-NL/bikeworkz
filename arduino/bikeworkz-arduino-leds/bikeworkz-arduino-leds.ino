@@ -27,7 +27,7 @@ const int ledLefGrePin = 9;
 const int ledLefYelPin = 11;
 const int ledLefRedPin = 12;
 const int ledCenGrePin = 5;
-const int ledCenYelPin = 0;
+const int ledCenYelPin = 6;
 const int ledCenRedPin = 7;
 const int ledRigGrePin = 2;
 const int ledRigYelPin = 3;
@@ -57,7 +57,7 @@ void loop() {
 
 
      switch (incomingByte) {
-      case 'w':
+      case '2':
         // middle red
         digitalWrite(ledLefGrePin, HIGH);
         digitalWrite(ledCenGrePin, LOW);
@@ -69,7 +69,19 @@ void loop() {
         digitalWrite(ledCenRedPin, HIGH);
         digitalWrite(ledRigRedPin, LOW);
         break;
-      case 'a':
+       case 'w':
+        // middle yellow
+        digitalWrite(ledLefGrePin, HIGH);
+        digitalWrite(ledCenGrePin, LOW);
+        digitalWrite(ledRigGrePin, HIGH);
+        digitalWrite(ledRigYelPin, LOW);
+        digitalWrite(ledCenYelPin, HIGH);
+        digitalWrite(ledLefYelPin, LOW);
+        digitalWrite(ledLefRedPin, LOW);
+        digitalWrite(ledCenRedPin, LOW);
+        digitalWrite(ledRigRedPin, LOW);
+        break;
+      case 'q':
         // left red
         digitalWrite(ledLefGrePin, LOW);
         digitalWrite(ledCenGrePin, HIGH);
@@ -81,7 +93,31 @@ void loop() {
         digitalWrite(ledCenRedPin, LOW);
         digitalWrite(ledRigRedPin, LOW);
         break;
+       case 'a':
+        // left yellow
+        digitalWrite(ledLefGrePin, LOW);
+        digitalWrite(ledCenGrePin, HIGH);
+        digitalWrite(ledRigGrePin, HIGH);
+        digitalWrite(ledRigYelPin, LOW);
+        digitalWrite(ledCenYelPin, LOW);
+        digitalWrite(ledLefYelPin, HIGH);
+        digitalWrite(ledLefRedPin, LOW);
+        digitalWrite(ledCenRedPin, LOW);
+        digitalWrite(ledRigRedPin, LOW);
+        break;
       case 'd':
+        // right yellow
+        digitalWrite(ledLefGrePin, HIGH);
+        digitalWrite(ledCenGrePin, HIGH);
+        digitalWrite(ledRigGrePin, LOW);
+        digitalWrite(ledRigYelPin, HIGH);
+        digitalWrite(ledCenYelPin, LOW);
+        digitalWrite(ledLefYelPin, LOW);
+        digitalWrite(ledLefRedPin, LOW);
+        digitalWrite(ledCenRedPin, LOW);
+        digitalWrite(ledRigRedPin, LOW);
+        break;
+       case 'e':
         // right red
         digitalWrite(ledLefGrePin, HIGH);
         digitalWrite(ledCenGrePin, HIGH);
