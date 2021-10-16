@@ -37,37 +37,41 @@ def run():
     camRgb.preview.link(nn.input)
     nn.out.link(nnOut.input)
 
+    f = open("joep.log", "w")
     # =================================================================================
     # RUN
     # =================================================================================
 
-    # Connect to device and start pipeline
-    with dai.Device(pipeline) as device:
+    try:
+        # Connect to device and start pipeline
+        with dai.Device(pipeline) as device:
 
-        # Output queues will be used to get the rgb frames and nn data from the outputs
-        # defined above
-        qRgb = device.getOutputQueue(name="rgb", maxSize=4, blocking=False)
-        qDet = device.getOutputQueue(name="nn", maxSize=4, blocking=False)
+            # Output queues will be used to get the rgb frames and nn data from the outputs
+            # defined above
+            qRgb = device.getOutputQueue(name="rgb", maxSize=4, blocking=False)
+            qDet = device.getOutputQueue(name="nn", maxSize=4, blocking=False)
 
-        while True:
-            # Use blocking get() call to catch frame and inference result synced
-            inDet = qDet.get()
+            while True:
+                # Use blocking get() call to catch frame and inference result synced
+                inDet = qDet.get()
 
-            if inDet is None:
-                continue
+                if inDet is None:
+                    continue
 
-            detected = False
-            for detection in inDet.detections:
-                if int(detection.label) == 5:
-                    detected = True
+                detected = False
+                for detection in inDet.detections:
+                    if int(detection.label) == 5:
+                        detected = True
 
-            if detected:
-                output = "1"
-            else:
-                output = "0"
+                if detected:
+                    output = "1"
+                else:
+                    output = "0"
 
-            with open("joep.log", "w") as f:
+                f.seek(0)
                 f.write(output)
+    finally:
+        f.close()
 
 
 if __name__ == "__main__":
