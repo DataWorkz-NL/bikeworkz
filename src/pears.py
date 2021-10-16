@@ -1,7 +1,7 @@
 from pathlib import Path
 import depthai as dai
 
-def run():
+def run() -> None:
     nnPath = str(Path("models/mobilenet-ssd/mobilenet-ssd.blob").resolve().absolute())
 
     # =================================================================================
