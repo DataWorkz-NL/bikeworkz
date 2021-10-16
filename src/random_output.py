@@ -1,7 +1,7 @@
 import os
 import random
 
-f = open("willem.log",'w')
+f = open("joep.log",'w')
 try:
 	while True:
 		output = str(random.choice([0, 1, 2,3])) + str(random.choice([0, 1]))
