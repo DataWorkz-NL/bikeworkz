@@ -50,3 +50,19 @@ python src/apple.py
 ```
 
 This should start writing detections (of bottles) to a file.
+
+### Notes
+
+To run examples in [depthai-python](https://github.com/luxonis/depthai-python), first
+run:
+
+``` bash
+git clone git@github.com:luxonis/depthai-python.git
+cd examples
+python install_requirements.txt
+```
+
+- Make sure Raspian OS is up to date (libc6)
+- Python 3.9
+- libc6: >= 2.30
+- glibcxx_3.4.26
