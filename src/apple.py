@@ -29,7 +29,7 @@ CONFIG = {
 }
 
 
-def screen_position(detection, meta):
+def screen_position(detection: depthai.Detection, meta: depthai.FrameMetadata) -> str:
     """
     Get the x coordinate of the bounding box, calculate the center of the
     bounding box as a fraction of the screen width and convert this to: "left",
@@ -44,7 +44,7 @@ def screen_position(detection, meta):
         return "left"
 
 
-def run():
+def run() -> None:
 
     device = depthai.Device("", False)
     # Create the pipeline using the 'previewout, metaout & depth' stream,
@@ -56,15 +56,17 @@ def run():
         raise RuntimeError("Pipeline creation failed!")
 
     # We need an empty list
-    detections = []
+    detections: list[depthai.Detection] = []
     cont = True
 
     while cont:
+        nnet_packets: list[depthai.NNetPacket]
+        data_packets: list[depthai.DataPacket]
         nnet_packets, data_packets = pipeline.get_available_nnet_and_data_packets()
 
         # Do detections
         for nnet_packet in nnet_packets:
-            detections = list(nnet_packet.getDetectedObjects())
+            detections: list[depthai.Detection] = list(nnet_packet.getDetectedObjects())
 
         for packet in data_packets:
 

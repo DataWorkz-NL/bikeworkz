@@ -1,3 +1,4 @@
+from typing import Tuple
 from pathlib import Path
 import numpy as np
 import cv2      # opencv - display the video stream
@@ -18,13 +19,13 @@ from collections import deque
 # After 2 frames we can caluclate the avg speed
 
 CUM_FRAMES = 5
-speed_list = deque(maxlen=CUM_FRAMES)
+speed_list: deque = deque(maxlen=CUM_FRAMES)
 
-def calc_speed(f1, f0):
+def calc_speed(f1: np.ndarray, f0: np.ndarray) -> np.ndarray:
     return np.abs(f1 - f0)
 
 
-def calc_avg_speed(l):
+def calc_avg_speed(l: list[np.ndarray]) -> np.ndarray:
     cum = np.zeros_like(l[0])
     for ll in l:
         cum += ll
@@ -54,7 +55,7 @@ if pipeline is None:
 
 nn2depth = device.get_nn_to_depth_bbox_mapping()
 
-def nn_to_depth_coord(x, y, nn2depth):
+def nn_to_depth_coord(x: float, y: float, nn2depth: dict[str, int]) -> Tuple[int, int]:
     x_depth = int(nn2depth['off_x'] + x * nn2depth['max_w'])
     y_depth = int(nn2depth['off_y'] + y * nn2depth['max_h'])
     return x_depth, y_depth
@@ -63,7 +64,7 @@ detections = []
 
 disparity_confidence_threshold = 130
 
-def on_trackbar_change(value):
+def on_trackbar_change(value: int) -> None:
     device.send_disparity_confidence_threshold(value)
     return
 

@@ -32,7 +32,7 @@ CONFIG = {
 }
 
 
-def screen_position(detection, meta):
+def screen_position(detection: depthai.Detection, meta: depthai.FrameMetadata) -> str:
     """
     Get the x coordinate of the bounding box, calculate the center of the
     bounding box as a fraction of the screen width and convert this to: "left",
@@ -47,7 +47,7 @@ def screen_position(detection, meta):
         return "left"
 
 
-def run(args):
+def run(args: argparse.Namespace):
 
     device = depthai.Device("", False)
     # Create the pipeline using the 'previewout, metaout & depth' stream,
