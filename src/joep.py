@@ -4,23 +4,30 @@ import time
 
 def one():
 	ser.write(b'w')
-	time.sleep(0.5)
+	time.sleep(0.1)
 	ser.write(b'r')
-	time.sleep(0.5)
+	time.sleep(0.1)
 	ser.write(b't')
-	return "green"
+	time.sleep(0.1)
+	print( "green")
  
 def two():
-	ser.writelines(b'w')
-	ser.writelines(b'e')
-	ser.writelines(b'y')
-	return "yellow"
+	ser.write(b'w')
+	time.sleep(0.1)
+	ser.write(b'e')
+	time.sleep(0.1)
+	ser.write(b'y')
+	time.sleep(0.1)
+	print("yellow")
  
 def three():
-	ser.writelines(b'q')
-	ser.writelines(b'r')
-	ser.writelines(b'y')
-	return "red"
+	ser.write(b'q')
+	time.sleep(0.1)
+	ser.write(b'r')
+	time.sleep(0.1)
+	ser.write(b'y')
+	time.sleep(0.1)
+	print( "red")
 
 def numbers_to_function(argument):
 	switcher = {
@@ -34,13 +41,14 @@ def numbers_to_function(argument):
 	func()
 
 
-ser = serial.Serial('/dev/cu.usbserial-145330', 9800)
-
-
+ser = serial.Serial('/dev/cu.usbserial-145330', 115200)
+# sleep for device getting ready
+time.sleep(0.1)
 # ser.writelines(b'q')
 # time.sleep(0.5)
 # one()
 # ser.close()
+
 
 
 f = open("willem.log",'r')
@@ -53,7 +61,7 @@ try:
 		# print(lines)
 		first_line = f.readline()
 		numbers_to_function(first_line)
-		time.sleep(0.5) 
+		# time.sleep(0.5) 
 		f.seek(0)
 finally:
 	f.close()
