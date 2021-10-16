@@ -66,3 +66,10 @@ python install_requirements.txt
 - Python 3.9
 - libc6: >= 2.30
 - glibcxx_3.4.26
+
+## 2021-10-16, 16:42 - Something is working
+
+The script `src/pears.py` is now able to run on a Raspberry Pi. This means that we can
+run object detection on the camera and periodically update a file that will either
+contain a simple `0` or a `1`. The script `src/joep.py` will continually read the output
+file from `src/pears.py` and based on the number turn on an orange or a red LED.
