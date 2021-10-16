@@ -11,7 +11,6 @@ const int ledRigYelPin = 3;
 const int ledRigRedPin = 4;
 int incomingByte;      // a variable to read incoming serial data into
 
-
 const int noobArray[] = {
   ledLefGrePin,
   ledLefYelPin,
@@ -38,13 +37,12 @@ const String ledArray[9][2] = {
 const int arrayLength = 9;
 //const int ledLength = sizeof(ledArray);
 
+bool blinking = false;
 
 void setup() {
   // initialize serial communication:
   Serial.begin(115200);
-  // initialize the LED pin as an output:
   for (int i = 0; i <= 9; i++) {
-    //    pinMode(ledArray[i], OUTPUT);
     int id = ledArray[i][1].toInt();
     pinMode(id, OUTPUT);
   }
@@ -96,32 +94,138 @@ void loop() {
         woei[1] = ledCenGrePin;
         woei[2] = ledRigRedPin;
         break;
+
+      // Moves away from me - warning - green/yellow
+      // left
+      case 'h':
+        woei[0] = ledCenGrePin;
+        woei[1] = ledRigGrePin;
+        woei[2] = ledLefYelPin;
+        woei[3] = ledLefGrePin;
+        break;
+      // center
+      case 'j':
+        woei[0] = ledCenGrePin;
+        woei[1] = ledRigGrePin;
+        woei[2] = ledCenYelPin;
+        woei[3] = ledLefGrePin;
+        break;
+      // right
+      case 'k':
+        woei[0] = ledCenGrePin;
+        woei[1] = ledRigGrePin;
+        woei[2] = ledRigYelPin;
+        woei[3] = ledLefGrePin;
+        break;
+
+      // Moves closer to me (slowly) - yellow/read
+      // left
+      case 'y':
+        woei[0] = ledCenGrePin;
+        woei[1] = ledRigGrePin;
+        woei[2] = ledLefYelPin;
+        woei[3] = ledLefRedPin;
+        break;
+      // center
+      case 'u':
+        woei[0] = ledCenRedPin;
+        woei[1] = ledRigGrePin;
+        woei[2] = ledCenYelPin;
+        woei[3] = ledLefGrePin;
+        break;
+      // right
+      case 'i':
+        woei[0] = ledCenGrePin;
+        woei[1] = ledRigRedPin;
+        woei[2] = ledRigYelPin;
+        woei[3] = ledLefGrePin;
+        break;
+
+      // Moves alarmingly fast closer to me - red/blinking
+      // left
+      case '6':
+        blinking = true;
+        woei[0] = ledCenGrePin;
+        woei[1] = ledRigGrePin;
+        woei[2] = ledLefRedPin;
+        break;
+      // center
+      case '7':
+        blinking = true;
+        woei[0] = ledCenRedPin;
+        woei[1] = ledRigGrePin;
+        woei[2] = ledLefGrePin;
+        break;
+      // right
+      case '8':
+        blinking = true;
+        woei[0] = ledCenGrePin;
+        woei[1] = ledRigRedPin;
+        woei[2] = ledLefGrePin;
+        break;
+
       case 's':
         // good state
         woei[0] = ledLefGrePin;
         woei[1] = ledCenGrePin;
         woei[2] = ledRigGrePin;
         break;
-
     }
     writeDigital(woei);
+    memset(woei, 0, sizeof(woei));
   }
 }
 
 void writeDigital(int list[]) {
   //  int length = 0;
+  int blinkingArray[arrayLength];
+  memset(blinkingArray, 0, sizeof(blinkingArray));
   for (int i = 0; i <= arrayLength; i++) {
     int id = ledArray[i][1].toInt();
+    
     if (inArrayInt(list, id)) {
-      digitalWrite(id, HIGH);
+      if (blinking) {
+        blinkingArray[i] = id;
+      } else {
+        digitalWrite(id, HIGH);
+      }
     } else {
       digitalWrite(id, LOW);
     }
   }
+
+  if (blinking) {
+    int var = 0;
+    while (var <= 5) {
+      digitalWrite(blinkingArray[0], HIGH);
+      digitalWrite(blinkingArray[1], HIGH);
+      digitalWrite(blinkingArray[2], HIGH);
+      digitalWrite(blinkingArray[3], HIGH);
+      digitalWrite(blinkingArray[4], HIGH);
+      digitalWrite(blinkingArray[5], HIGH);
+      digitalWrite(blinkingArray[6], HIGH);
+      digitalWrite(blinkingArray[7], HIGH);
+      digitalWrite(blinkingArray[8], HIGH);
+      delay(50);
+      digitalWrite(blinkingArray[0], LOW);
+      digitalWrite(blinkingArray[1], LOW);
+      digitalWrite(blinkingArray[2], LOW);
+      digitalWrite(blinkingArray[3], LOW);
+      digitalWrite(blinkingArray[4], LOW);
+      digitalWrite(blinkingArray[5], LOW);
+      digitalWrite(blinkingArray[6], LOW);
+      digitalWrite(blinkingArray[7], LOW);
+      digitalWrite(blinkingArray[8], LOW);
+      delay(50);
+      var ++;
+    }
+    blinking = false;
+  }
+
+
 }
 
 bool inArrayInt(int check[], int value) {
-  const int arrayLength = sizeof(check);
   for (int x = 0; x <= arrayLength; x++) {
     if (value == check[x]) {
       return true;
@@ -131,7 +235,6 @@ bool inArrayInt(int check[], int value) {
 }
 
 bool inArrayString(String check[], String value) {
-  const int arrayLength = sizeof(check);
   for (int x = 0; x < arrayLength; x++) {
     if (value == check[x]) {
       return true;

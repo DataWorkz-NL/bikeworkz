@@ -96,5 +96,5 @@ file contains two digits, which will determine the combination of LED's turning 
   - 3: Object detected on the right
 - Position 2:
   - 0: Moves away from me - warning - green/yellow
-  - 1: Moves closer to me (slowly) - yellow/read
+  - 1: Moves closer to me (slowly) - yellow/red
   - 2: Moves alarmingly fast closer to me - red/blinking

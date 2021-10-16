@@ -41,7 +41,7 @@ def numbers_to_function(argument):
     func()
 
 
-ser = serial.Serial('/dev/cu.usbserial-1460', 115200)
+ser = serial.Serial('/dev/cu.usbserial-146320', 115200)
 # sleep for device getting ready
 time.sleep(2)
 
@@ -52,17 +52,23 @@ def parse_code(code: str) -> str:
         if code[1] == '0':
             return b'a'    
         elif code[1] == '1': 
-            return b'q'
+            return b'y'
+        elif code[1] == '2': 
+            return b'6'
     elif code[0] == '2':
         if code[1] == '0':
             return b'w'    
         elif code[1] == '1': 
-            return b'2'
+            return b'u'
+        elif code[1] == '2': 
+            return b'7'
     elif code[0] == '3':
         if code[1] == '0':
             return b'd'    
         elif code[1] == '1': 
-            return b'e'
+            return b'i'
+        elif code[1] == '2': 
+            return b'8'
     else:
         return b's'
 
