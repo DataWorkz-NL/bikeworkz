@@ -23,11 +23,11 @@ def draw_frame(imgFrame, pos):
 def map_pos(det):
     xmean = (det.xmax + det.xmin) / 2
     if xmean < 0.33:
-        return "1"
+        return "3"
     elif 0.33 < xmean < 0.66:
         return "2"
     else:
-        return "3"
+        return "1"
 
 
 def run() -> None:
@@ -41,8 +41,6 @@ def run() -> None:
     # We need a pipeline. The pipeline runs on the device and we can ".get()" the output
     # of the different streams/components.
 
-    # TODO: since we do not use the camRgb, try to remove it for some performance
-    #   improvements.
     pipeline = dai.Pipeline()
 
     camRgb = pipeline.createColorCamera()
